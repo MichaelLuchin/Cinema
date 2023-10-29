@@ -1,0 +1,110 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+using namespace std;
+
+struct Snacks {
+    string NameSnack;
+    int PriceSnack;
+    int AmountSnack;
+};
+
+int CheckSnackSelected() {
+    int checker;
+    while (!(cin >> checker) || cin.peek() != '\n' || checker < 0 || checker > 8)
+    {
+        cout << "Incorrect selected purchase. Try again." << endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+    return checker;
+}
+int CheckAmountSnackSelected() {
+    int checker;
+    while (!(cin >> checker) || cin.peek() != '\n' || checker < 0 || checker > 100)
+    {
+        cout << "Incorrect selected amount. Try from 0 to 5." << endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+    return checker;
+}
+void BuySomething() {
+    ifstream file("snacks.txt");
+    vector <Snacks> purchases;
+    Snacks snack;
+    while (file >> snack.NameSnack >> snack.PriceSnack >> snack.AmountSnack) {
+        purchases.push_back(snack);
+    }
+    file.close();
+    for (int i = 0; i < purchases.size(); i++) {
+        cout << i + 1 << ". " << purchases[i].NameSnack << " (" << purchases[i].PriceSnack << " rubles). " << "amount: " << purchases[i].AmountSnack << endl;
+
+    }
+
+    int choiceBuyer;
+    cout << "What you want buy? (0 - if you changed your mind)" << endl;
+    choiceBuyer = CheckSnackSelected();
+
+    int PriceYourPurchase = 0;
+    if (choiceBuyer == 0) {
+        cout << "Enjoy watching movie!";
+    }
+    else {
+        while (choiceBuyer != 0) {
+
+            int amount;
+            cout << "How much do you want to buy?" << endl;
+            amount = CheckAmountSnackSelected();
+            if (purchases[choiceBuyer - 1].AmountSnack == 0) {
+                cout << "This product is out of stock. (Choose another or 0 - if you dont want anything else)" << endl;
+                choiceBuyer = CheckSnackSelected();
+            }
+            else if (amount > purchases[choiceBuyer - 1].AmountSnack) {
+                cout << "We have only " << purchases[choiceBuyer - 1].AmountSnack << " " << purchases[choiceBuyer - 1].NameSnack << "." << endl;
+                amount = CheckAmountSnackSelected();
+                while (amount > purchases[choiceBuyer - 1].AmountSnack) {
+                    cout << "Choose less of this product." << endl;
+                    cin >> amount;
+                }
+                int PricePurchase = amount * purchases[choiceBuyer - 1].PriceSnack;
+                PriceYourPurchase += PricePurchase;
+                cout << "Want something more? (0 - if you dont want anything else. " << endl;
+                choiceBuyer = CheckSnackSelected();
+            }
+            else {
+                int PricePurchase = amount * purchases[choiceBuyer - 1].PriceSnack;
+                PriceYourPurchase += PricePurchase;
+                cout << "Want something more? (0 - if you dont want anything else. " << endl;
+                choiceBuyer = CheckSnackSelected();
+            }
+        }
+    }
+    if (PriceYourPurchase == 0) {
+        cout << "Well, you didn't buy anything. Enjoy watching movie." << endl;
+    }
+    else {
+        cout << PriceYourPurchase << " <--- this is how much you spent. Enjoy watching movie.";
+    }
+}
+void WannaBuySomething() {
+    string answer;
+    cout << "Do you want to buy something for the movie?" << endl;
+    while (true) {
+        cin >> answer;
+        if (answer == "yes") {
+            BuySomething();
+            break;
+        }
+        else if (answer == "no") {
+            cout << "Well. Enjoy watching movie. Bye!";
+            break;
+        }
+        else {
+            cout << "I dont understand you! Please answer me 'yes' or 'no': ";
+        }
+    }
+}
+int main() {
+    WannaBuySomething();
+}
