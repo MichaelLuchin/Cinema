@@ -1,0 +1,149 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Типы сидений
+enum struct Seat : unsigned char {
+
+	// нет места (дырка)
+	None,
+
+	// занято
+	Occupied,
+
+	// обычное место
+	Regular,
+
+	// вип место дороже
+	Vip,
+
+	// диванчик стоит как вип место, но если
+	// они стоят подряд, то их можно купить
+	// только все разом
+	Sofa,
+};
+
+
+struct Movie {
+	// название фильма
+	string Title;
+	// время начала в минутах от начала суток
+	int StartTime;
+	// длительность в минутах
+	int Duration;
+	// множитель цены сидений	
+	int PriceCoefficient;
+	// кинозал - вектор рядов (векторов) сидений
+	vector<vector<Seat>> Hall;
+
+	void generate_random_hall(int w, int h,
+		vector<Seat> seat_types =
+		{
+			Seat::None, Seat::Occupied, Seat::Regular,
+			Seat::Sofa, Seat::Vip 
+		})
+	{
+		srand(time(0));
+		
+		this->Hall.resize(h);
+		for (auto& r : this->Hall)
+		{
+			r.resize(w);
+			for (auto& v : r)
+				v = seat_types[rand() % seat_types.size()];
+		}
+	}
+};
+
+//int** hall(int rows, int cols)
+//{
+//	srand(time(NULL));
+//	int **seats = new int*[rows];
+//	for (int i = 0; i < cols; i++)
+//		seats[i] = new int[cols];
+//
+//	for (int i = 0; i < rows; i++)
+//	{
+//		for (int j = 0; j < cols; j++)
+//		{
+//			int r = rand() % 2;
+//			if (rows < cols) seats[i][j] = r;
+//			else seats[j][i] = r;
+//			if (r == 1) cout << "[X]";
+//			else cout << "[ ]";
+//		}
+//		cout << " | " << i + 1 << '\n';
+//	}
+//
+//	return seats;
+//}
+
+struct row_and_col
+{
+	int row;
+	int col;
+};
+
+vector<row_and_col> free(vector<vector<Seat>> Hall, int k)
+{
+	vector<row_and_col> row;
+	int near_free = 0;
+	for (int i = 0; i < Hall.size(); i++)
+	{
+		for (int j = 0; j < Hall[i].size(); j++)
+		{
+			if (Hall[i][j] == Seat::Occupied || Hall[i][j] == Seat::None)
+				near_free = 0;
+			else
+			{
+				near_free++;
+
+				// TODO: проверять на отрезки дивана
+				if (near_free >= k) 
+					row.push_back({ i, j - k + 1 });
+			}
+		}
+		near_free = 0;
+	}
+
+	/*
+	for (int i = 0; i < rows; i++)
+		if (row[i] == i + 1 && k <= rows)
+		{
+			cout << row[i] << " row has " << k << " free places." << '\n';
+			counter++;
+		}
+	if (counter == 0)
+		cout << "there is no " << k << " free places in any row." << '\n';
+	*/
+	return row;
+}
+
+int main()
+{
+	Movie sm;
+
+	/*sm.Hall.resize(3);
+	for (auto& row : sm.Hall)
+		row.resize(3, Seat::None);*/
+
+	sm.generate_random_hall(4, 4);
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			if (sm.Hall[i][j] == Seat::Occupied || sm.Hall[i][j] == Seat::None)
+			{
+				cout << "1 ";
+			}
+			else cout << "0 ";
+		}
+		cout << '\n';
+	}
+
+	for (auto v : free(sm.Hall, 2))
+		cout << v.row + 1 << " " << v.col + 1 << '\n';
+
+}
+
