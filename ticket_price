@@ -1,0 +1,168 @@
+#include <locale>
+#include <iostream>
+#include <string> 
+#include <vector>
+#include <set>
+using namespace std;
+// Типы сидений
+enum struct Seat : unsigned char {
+    // нет места (дырка)
+    None,
+    // занято
+    Occupied,
+    // обычное место
+    Regular,
+    // вип место дороже
+    Vip,
+    // диванчик стоит как вип место, но если
+    // они стоят подряд, то их можно купить
+    // только все разом
+    Sofa,
+};
+
+struct Snack {
+    // придумайте какие поля имеют снэки
+    // название и цена или ещё что-то?
+    // написать максиму для хранения этого в файле
+};
+
+struct Movie {
+    // название фильма
+    string Title;
+    // время начала в минутах от начала суток
+    int StartTime;
+    // длительность в минутах
+    int Duration;
+    // множитель цены сидений
+    int PriceCoefficient;
+    // снэки
+    vector<Snack> Snacks;
+    // кинозал - вектор рядов (векторов) сидений
+    //vector<Seat> Row;
+    vector<vector<Seat>> Hall;
+    void generate_random_hall(int w, int h, set<Seat> seat_types =
+        {
+            Seat::None, Seat::Occupied, Seat::Regular,
+            Seat::Sofa, Seat::Vip
+        })
+    {
+        srand(time(0));
+        this->Hall.resize(h);
+        for (auto& r : this->Hall)
+        {
+            r.resize(w);
+            for (auto& v : r)
+                v = Seat(rand() % seat_types.size());
+        }
+    }
+    void output_seats(Seat v, int& q)
+    {
+        switch (v)
+        {
+        case Seat::None:
+            cout << "  ";
+            for (int i = 0; i < to_string(q).length(); ++i)
+                cout << " ";
+            break;
+        case Seat::Occupied:
+            cout << "[";
+            for (int i = 0; i < to_string(q).length(); ++i)
+                cout << "#";
+            cout << "]";
+            break;
+        case Seat::Regular:
+            cout << "[" << q << "]";
+            break;
+        case Seat::Vip:
+            cout << "{" << q << "}";
+            break;
+        case Seat::Sofa:
+            cout << "(" << q << ")";
+            break;
+        }
+    }
+};
+void output_hall(int rows, Movie movie)
+{
+    int j = 0;
+    for (int i = 0; i < rows; ++i)
+    {
+        cout << " || ";
+        if (rows >= 9 && i < 9)
+            cout << " ";
+        cout << 1 + i << ": ";
+        int q = 1;
+        for (auto& v : movie.Hall[i])
+        {
+            movie.output_seats(v, q);
+            ++q;
+        }
+        cout << "  ||\n";
+    }
+}
+
+
+
+void TicketPrice(Movie movie)
+{
+
+    int summ = 0;
+    cout << "Сколько мест хотите купить?" << endl;
+    int k;
+    cin >> k;
+    for (int i = 1; i <= k;)
+    {
+        int row, row_seats;
+        cout << "Введите место " << endl;
+        cin >> row >> row_seats;
+        auto v = movie.Hall[row - 1][row_seats - 1];
+        double time;
+        cout << "Выберите время\n";
+        cin >> time;
+        if (14 >= time > 10)
+            summ = 200;
+        if (18 >= time > 14)
+            summ = 200 * 1.15;
+        if (22 >= time > 18)
+            summ = 200 * 1.4;
+        if (24 >= time > 22)
+            summ = 200 * 1.5;
+        switch (v)
+        {
+        case Seat::None:
+            cout << "Такого места не существует" << endl;
+            break;
+        case Seat::Occupied:
+            cout << "Это место занято" << endl;
+            break;
+        case Seat::Regular:
+            summ += 200;
+            i++;
+            break;
+        case Seat::Vip:
+            summ += (200 * 1.35);
+            i++;
+            break;
+        case Seat::Sofa:
+            summ += (200 * 1.35);
+            cout << "диван" << endl;
+            i++;
+            break;
+        }
+    }
+
+    cout << "Стоимоть билетов:" << summ << endl;
+}
+
+
+
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+    int row_seats = 10, rows = 10;
+    Movie movie;
+    movie.generate_random_hall(row_seats, rows);
+    output_hall(rows, movie);
+    TicketPrice(movie);
+}
