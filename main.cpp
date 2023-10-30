@@ -23,24 +23,24 @@ enum struct seat : unsigned char {
   sofa,
 };
 
-struct snack {
-  string name;
-  int price;
-  int amount;
-};
+// struct snack {
+//   string name;
+//   int price;
+//   int amount;
+// };
 
-istream &operator>>(istream &is, snack &snack) {
-  is >> snack.name;
-  is >> snack.price;
-  is >> snack.amount;
-  return is;
-};
+// istream &operator>>(istream &is, snack &snack) {
+//   is >> snack.name;
+//   is >> snack.price;
+//   is >> snack.amount;
+//   return is;
+// };
 
 struct movie {
   string title;
   string show_time;
   int price;
-  vector<snack> snacks;
+  // vector<snack> snacks;
   vector<vector<seat>> hall;
 
   void generate_random_hall(int w, int h) {
@@ -48,7 +48,7 @@ struct movie {
     for (auto &r : this->hall) {
       r.resize(w);
       for (auto &v : r)
-        v = seat(rand() % 2 + 1);
+        v = seat(rand() % 3 + 1);
     }
   };
 };
@@ -58,14 +58,13 @@ istream &operator>>(istream &is, movie &movie) {
   getline(is, movie.show_time, '\t');
 
   is >> movie.price;
-
   is.ignore(1, '\t');
 
   // чтение снэков
-  snack snck;
-  while (is.peek() != '\t' && is >> snck) {
-    movie.snacks.push_back(snck);
-  }
+  // snack snck;
+  // while (is.peek() != '\t' && is >> snck) {
+  //   movie.snacks.push_back(snck);
+  // }
 
   movie.generate_random_hall(10, 10);
 
