@@ -66,47 +66,47 @@ istream &operator>>(istream &is, movie &movie) {
   //   movie.snacks.push_back(snck);
   // }
 
-  movie.generate_random_hall(10, 10);
+  // movie.generate_random_hall(10, 10);
 
   // парсинг зала
-  // vector<seat> row;
-  // while (!is.eof()) {
-  //   int count = 0;
-  //   if (!(is >> count) || count < 1)
-  //     count = 1;
+  vector<seat> row;
+  while (!is.eof()) {
+    int count = 0;
+    if (!(is >> count) || count < 1)
+      count = 1;
 
-  //   seat typ;
-  //   char letter;
-  //   is >> letter;
-  //   cout << count << letter;
-  //   switch (letter) {
-  //   case '_':
-  //     typ = seat::none;
-  //     break;
-  //   case 'x':
-  //     typ = seat::occupied;
-  //     break;
-  //   case 'r':
-  //     typ = seat::regular;
-  //     break;
-  //   case 'v':
-  //     typ = seat::vip;
-  //     break;
-  //   case 's':
-  //     typ = seat::sofa;
-  //     break;
-  //   case '?':
-  //     typ = seat(rand() % 2 + 1);
-  //     break;
-  //   }
+    char letter;
+    is >> letter;
+    cout << count << letter;
+    switch (letter) {
+    case '_':
+      row.resize(row.size() + count, seat::none);
+      break;
+    case 'x':
+      row.resize(row.size() + count, seat::occupied);
+      break;
+    case 'r':
+      row.resize(row.size() + count, seat::regular);
+      break;
+    case 'v':
+      row.resize(row.size() + count, seat::vip);
+      break;
+    case 's':
+      row.resize(row.size() + count, seat::sofa);
+      break;
+    case '?':
+      row.reserve(row.size() + count);
+      for (int i = 0; i < count; i++)
+        row.push_back(seat(rand() % 2 + 1));
+      break;
+    }
 
-  //   row.resize(row.size() + count, typ);
-
-  //   if (is.peek() == ' ') {
-  //     movie.hall.push_back(row);
-  //     row = vector<seat>(0);
-  //   }
-  // }
+    if (is.peek() == ' ') {
+      movie.hall.push_back(row);
+      row = vector<seat>();
+    }
+  }
+  movie.hall.push_back(row);
 
   return is;
 };
