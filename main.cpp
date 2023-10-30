@@ -112,43 +112,59 @@ istream &operator>>(istream &is, movie &movie) {
 };
 
 ostream &operator<<(ostream &os, const movie &movie) {
-  int j = 0;
-  int rows = movie.hall.size();
+  int w = 0;
+  for (const auto &row : movie.hall)
+    w = log10(row.size()) > w ? log10(row.size()) : w;
 
-  for (int i = 0; i < rows; ++i) {
-    cout << " || ";
-    if (rows >= 9 && i < 9)
-      cout << " ";
-    cout << 1 + i << ": ";
-    int q = 1;
+  for (int row = 0; row < movie.hall.size(); row++) {
+    cout << "| " << setw(w + 1) << row + 1 << " |";
 
-    for (const auto v : movie.hall[i]) {
-      switch (v) {
+    for (int col = 0; col < movie.hall[row].size(); col++) {
+      switch (movie.hall[row][col]) {
       case seat::none:
-        os << "  ";
-        for (int i = 0; i < to_string(q).length(); ++i)
-          os << " ";
+        cout << "  ";
+        for (int i = 0; i <= w; i++)
+          cout << " ";
         break;
+
       case seat::occupied:
-        os << "[";
-        for (int i = 0; i < to_string(q).length(); ++i)
-          os << "#";
-        os << "]";
+        cout << " ";
+        for (int i = 0; i <= w; i++)
+          cout << "#";
+        cout << " ";
         break;
+
       case seat::regular:
-        os << "[" << q << "]";
+        cout << " " << setw(w + 1) << setfill('0') << col + 1 << " ";
         break;
+
       case seat::vip:
-        os << "{" << q << "}";
+        cout << "[" << setw(w + 1) << setfill('0') << col + 1 << "]";
         break;
+
       case seat::sofa:
-        os << "(" << q << ")";
+        if (col == 0 || movie.hall[row][col - 1] != seat::sofa)
+          cout << "(";
+        else
+          cout << " ";
+
+        cout << setw(w + 1) << setfill('0') << col + 1;
+
+        if (col == movie.hall[row].size() - 1 ||
+            movie.hall[row][col + 1] != seat::sofa)
+          cout << ")";
+        else
+          cout << " ";
+
         break;
       }
-      ++q;
     }
-    cout << "  ||\n";
+
+    cout << setfill(' ');
+    cout << endl;
   }
+
+  cout << setw(0);
 
   return os;
 }
@@ -269,11 +285,10 @@ template <typename T> T ask(string msg) {
 bool prog(const vector<movie> &movies) {
   cout << "желаете посмотреть фильм?" << endl;
   cout << "доступные фильмы:" << endl;
-  cout << setw(log10(movies.size()));
   for (int i = 0; i < movies.size(); i++) {
     movie m = movies[i];
-    cout << i + 1 << " | " << m.show_time << " | " << m.price << "руб/место | "
-         << m.title << endl;
+    cout << setw(log10(movies.size()) + 1) << i + 1 << " | " << m.show_time
+         << " | " << m.price << "руб/место | " << m.title << endl;
   }
   cout << setw(0);
 
