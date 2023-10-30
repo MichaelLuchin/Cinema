@@ -38,9 +38,8 @@ istream &operator>>(istream &is, snack &snack) {
 
 struct movie {
   string title;
-  string show_date;
   string show_time;
-  int price_coef;
+  int price;
   vector<snack> snacks;
   vector<vector<seat>> hall;
 
@@ -56,21 +55,59 @@ struct movie {
 
 istream &operator>>(istream &is, movie &movie) {
   getline(is, movie.title, '\t');
-  // for (string part; (is >> part) && is.peek() != '\t';)
-  //   movie.title += part + (is.peek() != '\t' ? " " : "");
+  getline(is, movie.show_time, '\t');
 
-  is >> movie.show_date;
-  is >> movie.show_time;
-  is >> movie.price_coef;
+  is >> movie.price;
 
   is.ignore(1, '\t');
 
+  // чтение снэков
   snack snck;
   while (is.peek() != '\t' && is >> snck) {
     movie.snacks.push_back(snck);
   }
 
   movie.generate_random_hall(10, 10);
+
+  // парсинг зала
+  // vector<seat> row;
+  // while (!is.eof()) {
+  //   int count = 0;
+  //   if (!(is >> count) || count < 1)
+  //     count = 1;
+
+  //   seat typ;
+  //   char letter;
+  //   is >> letter;
+  //   cout << count << letter;
+  //   switch (letter) {
+  //   case '_':
+  //     typ = seat::none;
+  //     break;
+  //   case 'x':
+  //     typ = seat::occupied;
+  //     break;
+  //   case 'r':
+  //     typ = seat::regular;
+  //     break;
+  //   case 'v':
+  //     typ = seat::vip;
+  //     break;
+  //   case 's':
+  //     typ = seat::sofa;
+  //     break;
+  //   case '?':
+  //     typ = seat(rand() % 2 + 1);
+  //     break;
+  //   }
+
+  //   row.resize(row.size() + count, typ);
+
+  //   if (is.peek() == ' ') {
+  //     movie.hall.push_back(row);
+  //     row = vector<seat>(0);
+  //   }
+  // }
 
   return is;
 };
@@ -175,7 +212,7 @@ struct row_and_col {
   int col;
 };
 
-vector<row_and_col> find_open_seats(vector<vector<seat>> hall, int k) {
+vector<row_and_col> find_open_seats(const vector<vector<seat>> &hall, int k) {
   vector<row_and_col> row;
   int near_free = 0;
   for (int i = 0; i < hall.size(); i++) {
@@ -195,6 +232,34 @@ vector<row_and_col> find_open_seats(vector<vector<seat>> hall, int k) {
   return row;
 }
 
+int calculate_price(const movie &movie, row_and_col rc, int visitors) {
+  int sum = 0;
+
+  if (rc.row < 0 || rc.row >= movie.hall.size())
+    return -1;
+
+  auto row = movie.hall[rc.row];
+  if (rc.col + visitors - 1 >= row.size())
+    return -1;
+
+  for (int i = 0; i < visitors; i++) {
+    switch (row[rc.col + i]) {
+    case seat::none:
+    case seat::occupied:
+      return -1;
+    case seat::regular:
+      sum += movie.price;
+      break;
+    case seat::vip:
+    case seat::sofa:
+      sum += (movie.price * 1.35);
+      break;
+    }
+  }
+
+  return sum;
+}
+
 template <typename T> T ask(string msg) {
   T v;
   while (!(cout << msg) || !(cin >> v))
@@ -202,21 +267,14 @@ template <typename T> T ask(string msg) {
   return v;
 }
 
-int main() {
-  setlocale(LC_ALL, "Russian");
-  srand(time(NULL));
-
-  vector<movie> movies = get_movies("movies.tsv");
-
-  print_clerk();
-
+void prog(const vector<movie> &movies) {
+  cout << "желаете посмотреть фильм?" << endl;
   cout << "доступные фильмы:" << endl;
   cout << setw(log10(movies.size()));
   for (int i = 0; i < movies.size(); i++) {
     movie m = movies[i];
-    cout << i + 1 << ": ";
-    cout << m.show_date << " " << m.show_time << " : " << m.title;
-    cout << endl;
+    cout << i + 1 << " | " << m.show_time << " | " << m.price << "руб/место | "
+         << m.title << endl;
   }
   cout << setw(0);
 
@@ -233,16 +291,38 @@ int main() {
     visitors = ask<int>("введите кол-во человек: ");
 
   auto open_seats = find_open_seats(movies[choice].hall, visitors);
-  
+  if (open_seats.size() == 0) {
+    cout << "мест нет, извините :(" << endl;
+    return;
+  }
+
   cout << endl;
-  cout << "доступные места для " << visitors << " человек: \n";
+  cout << "доступные места для " << visitors << " человек: " << endl;
   for (int i = 0; i < open_seats.size() && i < 10; i++) {
-    cout << "ряд " << open_seats[i].row + 1 << ", места ";
-    cout << open_seats[i].col + 1 << "-" << open_seats[i].col + 1 + visitors;
-    cout << endl;
+    cout << "| " << i + 1 << " | "
+         << "ряд " << open_seats[i].row + 1 << ", места "
+         << open_seats[i].col + 1 << "-" << open_seats[i].col + visitors << " ("
+         << calculate_price(movies[choice], open_seats[i], visitors) << "руб)"
+         << endl;
   }
   if (open_seats.size() >= 10)
-    cout << "и другие..\n";
+    cout << "и другие.." << endl;
+
+  int rci = 0;
+  while (rci < 1 || rci > open_seats.size())
+    rci = ask<int>("выберите места: ");
+}
+
+int main() {
+  setlocale(LC_ALL, "Russian");
+  srand(time(NULL));
+
+  print_clerk();
+
+  vector<movie> movies = get_movies("movies.tsv");
+
+  while (true)
+    prog(movies);
 
   return 0;
 }
