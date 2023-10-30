@@ -266,7 +266,7 @@ template <typename T> T ask(string msg) {
   return v;
 }
 
-void prog(const vector<movie> &movies) {
+bool prog(const vector<movie> &movies) {
   cout << "желаете посмотреть фильм?" << endl;
   cout << "доступные фильмы:" << endl;
   cout << setw(log10(movies.size()));
@@ -292,7 +292,7 @@ void prog(const vector<movie> &movies) {
   auto open_seats = find_open_seats(movies[choice].hall, visitors);
   if (open_seats.size() == 0) {
     cout << "мест нет, извините :(" << endl;
-    return;
+    return true;
   }
 
   cout << endl;
@@ -310,6 +310,9 @@ void prog(const vector<movie> &movies) {
   int rci = 0;
   while (rci < 1 || rci > open_seats.size())
     rci = ask<int>("выберите места: ");
+
+  cout << "приятного просмотра!" << endl;
+  return false;
 }
 
 int main() {
@@ -320,8 +323,8 @@ int main() {
 
   vector<movie> movies = get_movies("movies.tsv");
 
-  while (true)
-    prog(movies);
+  while (prog(movies))
+    cout << endl;
 
   return 0;
 }
