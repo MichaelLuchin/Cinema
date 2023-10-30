@@ -1,10 +1,11 @@
-﻿#include <math.h>
+﻿
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <math.h>
 
 using namespace std;
 
