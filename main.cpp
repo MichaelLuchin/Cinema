@@ -1,5 +1,4 @@
-﻿
-#include <fstream>
+﻿#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <math.h>
@@ -122,50 +121,50 @@ ostream &operator<<(ostream &os, const movie &movie) {
     w = log10(row.size()) > w ? log10(row.size()) : w;
 
   for (int row = 0; row < movie.hall.size(); row++) {
-    cout << "| " << setw(w + 1) << row + 1 << " |";
+    os << "| " << setw(w + 1) << setfill('0') << row + 1 << " |";
 
     for (int col = 0; col < movie.hall[row].size(); col++) {
       switch (movie.hall[row][col]) {
       case seat::none:
-        cout << "  ";
+        os << "  ";
         for (int i = 0; i <= w; i++)
-          cout << " ";
+          os << " ";
         break;
 
       case seat::occupied:
-        cout << " ";
+        os << " ";
         for (int i = 0; i <= w; i++)
-          cout << "#";
-        cout << " ";
+          os << "#";
+        os << " ";
         break;
 
       case seat::regular:
-        cout << " " << setw(w + 1) << setfill('0') << col + 1 << " ";
+        os << " " << setw(w + 1) << setfill('0') << col + 1 << " ";
         break;
 
       case seat::vip:
-        cout << "[" << setw(w + 1) << setfill('0') << col + 1 << "]";
+        os << "[" << setw(w + 1) << setfill('0') << col + 1 << "]";
         break;
 
       case seat::sofa:
         if (col == 0 || movie.hall[row][col - 1] != seat::sofa)
-          cout << "(";
+          os << "(";
         else
-          cout << " ";
+          os << " ";
 
-        cout << setw(w + 1) << setfill('0') << col + 1;
+        os << setw(w + 1) << setfill('0') << col + 1;
 
         if (col == movie.hall[row].size() - 1 ||
             movie.hall[row][col + 1] != seat::sofa)
-          cout << ")";
+          os << ")";
         else
-          cout << " ";
+          os << " ";
 
         break;
       }
     }
 
-    cout << endl;
+    os << "\n";
   }
 
   return os;
@@ -197,30 +196,30 @@ vector<movie> get_movies(string filepath) {
 void print_clerk() {
   // clang-format off
   cout <<
-    "                                              :l'''''''''''''''l;" << endl <<
-    "                  .,,'''''','.                :;  ...'.......  ;;" << endl <<
-    "                .;:'       .',;'              :;  ',,;'.',,'.  :;" << endl <<
-    "              .;:.   ..'''..  .;:.            cl.''''',,''','.'l;" << endl <<
-    "             'c.  .,;,'..',;;'  .c'           oNNNNNNNNNNNNNNNNX:" << endl <<
-    "             :;  .c,.       .:;. .c.          lWMMMMMMMMMMMMMMMN:" << endl <<
-    "             :; .c, .c.   .:'.c;  ;:          o0kkkkkkkkkkkkkkO0:" << endl <<
-    "             c, .c'           ::  .c'         :;               :;" << endl <<
-    "            .c,  ::          .c'   ;:         :;               ;;" << endl <<
-    "            .c'  .;c         c.    ,c.        ::...............c;" << endl <<
-    "            .c.    .c'  .  'c.     'c.                           " << endl <<
-    "            'c.     ::     :l.     'c.                           " << endl <<
-    "            ,c. .',,,.     .',;;,. ,c.                           " << endl <<
-    "            :d:,:d;           .ll,,dl.                           " << endl <<
-    "         .;;;'. .c,           .c,  ,::;.                         " << endl <<
-    "        .c;     .ll,,,,,,,,,,,:o,    .l'       ...,;,'....       " << endl <<
-    "        ,c.     .c;...........'l,     :;     .coccc;;ccccl;      " << endl <<
-    "       .c'      .c,           .c,     'c;.   .coccc;;ccccl;      " << endl <<
-    "       ;:       .c,           .c,     .cx,   .coccc;;ccccl;      " << endl <<
-    "....;l,.........,c;...........,oc........'c;...cxx::d;..:o:..... " << endl <<
-    ":o,''',,,,,,,,,''''',,,,,,,,,',:;','',,''''',,',,;,,;,'',,,,'':o'" << endl <<
-    ":o,''',,,,,,,,,''''',,,,,,,,,',:;','',,''''',,',,;,,;,'',,,,'':o'" << endl <<
-    ":o,''',,,,,,,,,''''',,,,,,,,,',:;','',,''''',,',,;,,;,'',,,,'':o'" << endl <<
-    "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccl," << endl;
+    "                                              :l'''''''''''''''l;" << "\n" <<
+    "                  .,,'''''','.                :;  ...'.......  ;;" << "\n" <<
+    "                .;:'       .',;'              :;  ',,;'.',,'.  :;" << "\n" <<
+    "              .;:.   ..'''..  .;:.            cl.''''',,''','.'l;" << "\n" <<
+    "             'c.  .,;,'..',;;'  .c'           oNNNNNNNNNNNNNNNNX:" << "\n" <<
+    "             :;  .c,.       .:;. .c.          lWMMMMMMMMMMMMMMMN:" << "\n" <<
+    "             :; .c, .c.   .:'.c;  ;:          o0kkkkkkkkkkkkkkO0:" << "\n" <<
+    "             c, .c'           ::  .c'         :;               :;" << "\n" <<
+    "            .c,  ::          .c'   ;:         :;               ;;" << "\n" <<
+    "            .c'  .;c         c.    ,c.        ::...............c;" << "\n" <<
+    "            .c.    .c'  .  'c.     'c.                           " << "\n" <<
+    "            'c.     ::     :l.     'c.                           " << "\n" <<
+    "            ,c. .',,,.     .',;;,. ,c.                           " << "\n" <<
+    "            :d:,:d;           .ll,,dl.                           " << "\n" <<
+    "         .;;;'. .c,           .c,  ,::;.                         " << "\n" <<
+    "        .c;     .ll,,,,,,,,,,,:o,    .l'       ...,;,'....       " << "\n" <<
+    "        ,c.     .c;...........'l,     :;     .coccc;;ccccl;      " << "\n" <<
+    "       .c'      .c,           .c,     'c;.   .coccc;;ccccl;      " << "\n" <<
+    "       ;:       .c,           .c,     .cx,   .coccc;;ccccl;      " << "\n" <<
+    "....;l,.........,c;...........,oc........'c;...cxx::d;..:o:..... " << "\n" <<
+    ":o,''',,,,,,,,,''''',,,,,,,,,',:;','',,''''',,',,;,,;,'',,,,'':o'" << "\n" <<
+    ":o,''',,,,,,,,,''''',,,,,,,,,',:;','',,''''',,',,;,,;,'',,,,'':o'" << "\n" <<
+    ":o,''',,,,,,,,,''''',,,,,,,,,',:;','',,''''',,',,;,,;,'',,,,'':o'" << "\n" <<
+    "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccl," << "\n";
   // clang-format on
 }
 
@@ -284,18 +283,22 @@ int calculate_price(const movie &movie, row_and_col rc, int visitors) {
 
 template <typename T> T ask(string msg) {
   T v;
-  while (!(cout << msg) || !(cin >> v))
-    ;
+  while (!(cout << msg) || !(cin >> v)) {
+    cin.clear();
+    cin.ignore(LLONG_MAX, '\n');
+  };
   return v;
 }
 
 bool prog(vector<movie> &movies) {
-  cout << "желаете посмотреть фильм?" << endl;
-  cout << "доступные фильмы:" << endl;
+  cout << "желаете посмотреть фильм?"
+       << "\n";
+  cout << "доступные фильмы:"
+       << "\n";
   for (int i = 0; i < movies.size(); i++) {
     movie m = movies[i];
     cout << setw(log10(movies.size()) + 1) << i + 1 << " | " << m.show_time
-         << " | " << m.price << "руб/место | " << m.title << endl;
+         << " | " << m.price << "руб/место | " << m.title << "\n";
   }
   cout << setw(0);
 
@@ -305,9 +308,9 @@ bool prog(vector<movie> &movies) {
 
   choice--;
 
-  cout << endl;
+  cout << "\n";
   cout << movies[choice];
-  cout << endl;
+  cout << "\n";
 
   int visitors = 0;
   while (visitors < 1)
@@ -315,21 +318,25 @@ bool prog(vector<movie> &movies) {
 
   auto open_seats = find_open_seats(movies[choice].hall, visitors);
   if (open_seats.size() == 0) {
-    cout << "мест нет, извините :(" << endl;
+    cout << "мест нет, извините :("
+         << "\n";
     return true;
   }
 
-  cout << endl;
-  cout << "доступные места для " << visitors << " человек: " << endl;
+  cout << "\n";
+  cout << "доступные места для " << visitors << " человек: "
+       << "\n";
   for (int i = 0; i < open_seats.size() && i < 10; i++) {
-    cout << "| " << i + 1 << " | "
+    cout << "| " << setw(log10(open_seats.size()) + 1) << setfill('0') << i + 1
+         << " | "
          << "ряд " << open_seats[i].row + 1 << ", места "
          << open_seats[i].col + 1 << "-" << open_seats[i].col + visitors << " ("
          << calculate_price(movies[choice], open_seats[i], visitors) << "руб)"
-         << endl;
+         << "\n";
   }
   if (open_seats.size() >= 10)
-    cout << "и другие.." << endl;
+    cout << "и другие.."
+         << "\n";
 
   int rci = 0;
   while (rci < 1 || rci > open_seats.size())
@@ -338,7 +345,8 @@ bool prog(vector<movie> &movies) {
 
   claim_seats(movies[choice].hall, open_seats[rci], visitors);
 
-  cout << "приятного просмотра!" << endl;
+  cout << "приятного просмотра!"
+       << "\n";
   return true;
 }
 
@@ -351,7 +359,7 @@ int main() {
   vector<movie> movies = get_movies("movies.tsv");
 
   while (prog(movies))
-    cout << endl;
+    cout << "\n";
 
   return 0;
 }
