@@ -304,13 +304,13 @@ bool prog(vector<movie> &movies) {
 
   int choice = 0;
   while (choice < 1 || choice > movies.size())
-    choice = ask<int>("выберите фильм: ");
+    choice = ask<int>("введите номер фильма: ");
 
   choice--;
 
   cout << "\n";
   cout << movies[choice];
-  cout << "\n";
+  cout << "легенда: # - занято, [...] - вип место, (...) - диванчики\n";
 
   int visitors = 0;
   while (visitors < 1)
@@ -326,7 +326,7 @@ bool prog(vector<movie> &movies) {
   cout << "\n";
   cout << "доступные места для " << visitors << " человек: "
        << "\n";
-  for (int i = 0; i < open_seats.size() && i < 10; i++) {
+  for (int i = 0; i < open_seats.size() && i < 15; i++) {
     cout << "| " << setw(log10(open_seats.size()) + 1) << setfill('0') << i + 1
          << " | "
          << "ряд " << open_seats[i].row + 1 << ", места "
@@ -334,19 +334,18 @@ bool prog(vector<movie> &movies) {
          << calculate_price(movies[choice], open_seats[i], visitors) << "руб)"
          << "\n";
   }
-  if (open_seats.size() >= 10)
+  if (open_seats.size() >= 15)
     cout << "и другие.."
          << "\n";
 
   int rci = 0;
   while (rci < 1 || rci > open_seats.size())
-    rci = ask<int>("выберите места: ");
+    rci = ask<int>("выберите номер желаемой рассадки: ");
   rci--;
 
   claim_seats(movies[choice].hall, open_seats[rci], visitors);
 
-  cout << "приятного просмотра!"
-       << "\n";
+  cout << "\nзабронировали вам места.\nприятного просмотра!\n";
   return true;
 }
 
