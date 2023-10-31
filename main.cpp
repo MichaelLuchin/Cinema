@@ -2,10 +2,10 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <math.h>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <math.h>
 
 using namespace std;
 
@@ -73,13 +73,17 @@ istream &operator>>(istream &is, movie &movie) {
   vector<seat> row;
   while (!is.eof()) {
     int count = 0;
-    if (!(is >> count) || count < 1)
+    if (!(is >> count) || count < 1) {
+      is.clear();
       count = 1;
+    }
 
     char letter;
     is >> letter;
-    cout << count << letter;
     switch (letter) {
+    default:
+      is.get();
+      break;
     case '_':
       row.resize(row.size() + count, seat::none);
       break;
@@ -161,11 +165,8 @@ ostream &operator<<(ostream &os, const movie &movie) {
       }
     }
 
-    cout << setfill(' ');
     cout << endl;
   }
-
-  cout << setw(0);
 
   return os;
 }
@@ -248,6 +249,11 @@ vector<row_and_col> find_open_seats(const vector<vector<seat>> &hall, int k) {
   return row;
 }
 
+void claim_seats(vector<vector<seat>> &hall, row_and_col rc, int visitors) {
+  for (int i = 0; i < visitors; i++)
+    hall[rc.row][rc.col + i] = seat::occupied;
+}
+
 int calculate_price(const movie &movie, row_and_col rc, int visitors) {
   int sum = 0;
 
@@ -283,7 +289,7 @@ template <typename T> T ask(string msg) {
   return v;
 }
 
-bool prog(const vector<movie> &movies) {
+bool prog(vector<movie> &movies) {
   cout << "желаете посмотреть фильм?" << endl;
   cout << "доступные фильмы:" << endl;
   for (int i = 0; i < movies.size(); i++) {
@@ -296,6 +302,8 @@ bool prog(const vector<movie> &movies) {
   int choice = 0;
   while (choice < 1 || choice > movies.size())
     choice = ask<int>("выберите фильм: ");
+
+  choice--;
 
   cout << endl;
   cout << movies[choice];
@@ -326,9 +334,12 @@ bool prog(const vector<movie> &movies) {
   int rci = 0;
   while (rci < 1 || rci > open_seats.size())
     rci = ask<int>("выберите места: ");
+  rci--;
+
+  claim_seats(movies[choice].hall, open_seats[rci], visitors);
 
   cout << "приятного просмотра!" << endl;
-  return false;
+  return true;
 }
 
 int main() {
