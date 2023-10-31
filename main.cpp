@@ -1,4 +1,4 @@
-п»ї#include <fstream>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <math.h>
@@ -9,17 +9,17 @@
 using namespace std;
 
 enum struct seat : unsigned char {
-  // РЅРµС‚ РјРµСЃС‚Р° (РґС‹СЂРєР°)
+  // нет места (дырка)
   none,
-  // Р·Р°РЅСЏС‚Рѕ
+  // занято
   occupied,
-  // РѕР±С‹С‡РЅРѕРµ РјРµСЃС‚Рѕ
+  // обычное место
   regular,
-  // РІРёРї РјРµСЃС‚Рѕ РґРѕСЂРѕР¶Рµ
+  // вип место дороже
   vip,
-  // РґРёРІР°РЅС‡РёРє СЃС‚РѕРёС‚ РєР°Рє РІРёРї РјРµСЃС‚Рѕ, РЅРѕ РµСЃР»Рё
-  // РѕРЅРё СЃС‚РѕСЏС‚ РїРѕРґСЂСЏРґ, С‚Рѕ РёС… РјРѕР¶РЅРѕ РєСѓРїРёС‚СЊ
-  // С‚РѕР»СЊРєРѕ РІСЃРµ СЂР°Р·РѕРј
+  // диванчик стоит как вип место, но если
+  // они стоят подряд, то их можно купить
+  // только все разом
   sofa,
 };
 
@@ -60,7 +60,7 @@ istream &operator>>(istream &is, movie &movie) {
   is >> movie.price;
   is.ignore(1, '\t');
 
-  // С‡С‚РµРЅРёРµ СЃРЅСЌРєРѕРІ
+  // чтение снэков
   // snack snck;
   // while (is.peek() != '\t' && is >> snck) {
   //   movie.snacks.push_back(snck);
@@ -68,7 +68,7 @@ istream &operator>>(istream &is, movie &movie) {
 
   // movie.generate_random_hall(10, 10);
 
-  // РїР°СЂСЃРёРЅРі Р·Р°Р»Р°
+  // парсинг зала
   vector<seat> row;
   while (!is.eof()) {
     int count = 0;
@@ -179,7 +179,7 @@ vector<movie> get_movies(string filepath) {
 
   string line;
 
-  // РРіРЅРѕСЂРёСЂСѓРµРј РїРµСЂРІСѓСЋ СЃС‚СЂРѕС‡РєСѓ
+  // Игнорируем первую строчку
   getline(file, line);
 
   while (!file.eof() && getline(file, line).good()) {
@@ -238,7 +238,7 @@ vector<row_and_col> find_open_seats(const vector<vector<seat>> &hall, int k) {
       else {
         near_free++;
 
-        // TODO: РїСЂРѕРІРµСЂСЏС‚СЊ РЅР° РѕС‚СЂРµР·РєРё РґРёРІР°РЅР°
+        // TODO: проверять на отрезки дивана
         if (near_free >= k)
           row.push_back({i, j - k + 1});
       }
@@ -291,20 +291,20 @@ template <typename T> T ask(string msg) {
 }
 
 bool prog(vector<movie> &movies) {
-  cout << "Р¶РµР»Р°РµС‚Рµ РїРѕСЃРјРѕС‚СЂРµС‚СЊ С„РёР»СЊРј?"
+  cout << "желаете посмотреть фильм?"
        << "\n";
-  cout << "РґРѕСЃС‚СѓРїРЅС‹Рµ С„РёР»СЊРјС‹:"
+  cout << "доступные фильмы:"
        << "\n";
   for (int i = 0; i < movies.size(); i++) {
     movie m = movies[i];
     cout << setw(log10(movies.size()) + 1) << i + 1 << " | " << m.show_time
-         << " | " << m.price << "СЂСѓР±/РјРµСЃС‚Рѕ | " << m.title << "\n";
+         << " | " << m.price << "руб/место | " << m.title << "\n";
   }
   cout << setw(0);
 
   int choice = 0;
   while (choice < 1 || choice > movies.size())
-    choice = ask<int>("РІС‹Р±РµСЂРёС‚Рµ С„РёР»СЊРј: ");
+    choice = ask<int>("выберите фильм: ");
 
   choice--;
 
@@ -314,38 +314,38 @@ bool prog(vector<movie> &movies) {
 
   int visitors = 0;
   while (visitors < 1)
-    visitors = ask<int>("РІРІРµРґРёС‚Рµ РєРѕР»-РІРѕ С‡РµР»РѕРІРµРє: ");
+    visitors = ask<int>("введите кол-во человек: ");
 
   auto open_seats = find_open_seats(movies[choice].hall, visitors);
   if (open_seats.size() == 0) {
-    cout << "РјРµСЃС‚ РЅРµС‚, РёР·РІРёРЅРёС‚Рµ :("
+    cout << "мест нет, извините :("
          << "\n";
     return true;
   }
 
   cout << "\n";
-  cout << "РґРѕСЃС‚СѓРїРЅС‹Рµ РјРµСЃС‚Р° РґР»СЏ " << visitors << " С‡РµР»РѕРІРµРє: "
+  cout << "доступные места для " << visitors << " человек: "
        << "\n";
   for (int i = 0; i < open_seats.size() && i < 10; i++) {
     cout << "| " << setw(log10(open_seats.size()) + 1) << setfill('0') << i + 1
          << " | "
-         << "СЂСЏРґ " << open_seats[i].row + 1 << ", РјРµСЃС‚Р° "
+         << "ряд " << open_seats[i].row + 1 << ", места "
          << open_seats[i].col + 1 << "-" << open_seats[i].col + visitors << " ("
-         << calculate_price(movies[choice], open_seats[i], visitors) << "СЂСѓР±)"
+         << calculate_price(movies[choice], open_seats[i], visitors) << "руб)"
          << "\n";
   }
   if (open_seats.size() >= 10)
-    cout << "Рё РґСЂСѓРіРёРµ.."
+    cout << "и другие.."
          << "\n";
 
   int rci = 0;
   while (rci < 1 || rci > open_seats.size())
-    rci = ask<int>("РІС‹Р±РµСЂРёС‚Рµ РјРµСЃС‚Р°: ");
+    rci = ask<int>("выберите места: ");
   rci--;
 
   claim_seats(movies[choice].hall, open_seats[rci], visitors);
 
-  cout << "РїСЂРёСЏС‚РЅРѕРіРѕ РїСЂРѕСЃРјРѕС‚СЂР°!"
+  cout << "приятного просмотра!"
        << "\n";
   return true;
 }
