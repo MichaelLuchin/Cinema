@@ -121,7 +121,7 @@ ostream &operator<<(ostream &os, const movie &movie) {
     w = log10(row.size()) > w ? log10(row.size()) : w;
 
   for (int row = 0; row < movie.hall.size(); row++) {
-    os << "| " << setw(w + 1) << setfill('0') << row + 1 << " |";
+    os << setw(log10(movie.hall.size()) + 1) << setfill('0') << row + 1 << " |";
 
     for (int col = 0; col < movie.hall[row].size(); col++) {
       switch (movie.hall[row][col]) {
@@ -308,9 +308,10 @@ bool prog(vector<movie> &movies) {
 
   choice--;
 
-  cout << "\n";
-  cout << movies[choice];
-  cout << "легенда: # - занято, [...] - вип место, (...) - диванчики\n";
+  cout << "\nвы выбрали " << movies[choice].title << " на "
+       << movies[choice].show_time << "\n"
+       << "легенда: # - занято, [...] - вип место, (...) - диванчики\n\n"
+       << movies[choice];
 
   int visitors = 0;
   while (visitors < 1)
@@ -323,12 +324,10 @@ bool prog(vector<movie> &movies) {
     return true;
   }
 
-  cout << "\n";
-  cout << "доступные места для " << visitors << " человек: "
-       << "\n";
+  cout << "\nдоступные места для " << visitors << " человек:\n";
+
   for (int i = 0; i < open_seats.size() && i < 15; i++) {
-    cout << "| " << setw(log10(open_seats.size()) + 1) << setfill('0') << i + 1
-         << " | "
+    cout << setw(log10(open_seats.size()) + 1) << setfill('0') << i + 1 << " | "
          << "ряд " << open_seats[i].row + 1 << ", места "
          << open_seats[i].col + 1 << "-" << open_seats[i].col + visitors << " ("
          << calculate_price(movies[choice], open_seats[i], visitors) << "руб)"
@@ -345,7 +344,9 @@ bool prog(vector<movie> &movies) {
 
   claim_seats(movies[choice].hall, open_seats[rci], visitors);
 
-  cout << "\nзабронировали вам места.\nприятного просмотра!\n";
+  cout << "\nзабронировали вам места " << open_seats[rci].col + 1 << "-"
+       << open_seats[rci].col + visitors << " в ряду "
+       << open_seats[rci].row + 1 << "!\nприятного просмотра!\n\n";
   return true;
 }
 
