@@ -41,21 +41,6 @@ struct movie //структура, содержащая информацию о 
     int price; //цена билета
     
     vector<vector<seat>> hall; //матрица мест
-
-    void generate_random_hall(int w, int h)
-    {
-        this->hall.resize(h);
-        
-        for (auto& r : this->hall)
-        {
-            r.resize(w);
-            
-            for (auto& v : r)
-            {
-                v = seat(rand() % 3 + 1);
-            }
-        }
-    }
 };
 
 istream &operator>>(istream &is, movie &movie) //перегрузка оператора ввода для класса movie
@@ -107,7 +92,7 @@ istream &operator>>(istream &is, movie &movie) //перегрузка опера
                 row.resize(row.size() + count, seat::sofa);
                 break;
             
-            case '?':
+            case '?':// cлучайное занятое или свободное место
                 row.reserve(row.size() + count);
                 
                 for (int i = 0; i < count; i++)
